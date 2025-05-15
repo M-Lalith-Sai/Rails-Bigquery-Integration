@@ -8,7 +8,7 @@ development:
   database: storage/development.sqlite3
   bigquery:
     project_id: rails-bigquery-integration-new
-    dataset: transactions_data
+    dataset: bi_data
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
