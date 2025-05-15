@@ -1,0 +1,24 @@
+require 'csv'
+
+class TransactionsController < ApplicationController
+  def index
+    @transactions = []
+    CSV.foreach(Rails.root.join('db', 'transactions.csv'), headers: true) do |row|
+      @transactions << row.to_h
+    end
+
+    if params[:search].present?
+      @transactions = @transactions.select do |transaction|
+        transaction.any? { |key, value| value.to_s.downcase.include?(params[:search].to_s.downcase) }
+      end
+    end
+  end
+
+  def show
+    @transaction = @transactions.find { |t| t['Transaction'] == params[:id] }
+    if @transaction.nil?
+      flash[:alert] = "Transaction not found."
+      redirect_to transactions_path
+    end
+  end
+end

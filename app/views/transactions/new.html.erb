@@ -1,0 +1,18 @@
+<h1>New Transaction</h1>
+
+<%= form_with(url: transactions_path, scope: :transaction, method: :post) do |form| %>
+  <% if @transactions.present? && @transactions.first.present? %>
+    <% @transactions.first.keys.each do |key| %>
+      <div>
+        <%= form.label key.capitalize %>
+        <%= form.text_field key %>
+      </div>
+    <% end %>
+    <%= form.submit "Create Transaction" %>
+  <% else %>
+    <p>No transaction structure available to create a form.</p>
+    <%= link_to 'Back to Transactions', transactions_path %>
+  <% end %>
+<% end %>
+
+<%= link_to 'Back to Transactions', transactions_path %>

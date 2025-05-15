@@ -1,0 +1,19 @@
+<h1>Edit Transaction</h1>
+
+<% if @transaction.present? %>
+  <%= form_with(url: transaction_path(@transaction['Transaction']), scope: :transaction, method: :patch) do |form| %>
+    <% @transaction.each do |key, value| %>
+      <div>
+        <%= form.label key.capitalize %>
+        <%= form.text_field key, value: value %>
+      </div>
+    <% end %>
+    <%= form.submit "Update Transaction" %>
+  <% end %>
+
+  <%= link_to 'Back to Transaction', transaction_path(@transaction['Transaction']) %> |
+  <%= link_to 'Back to Transactions', transactions_path %>
+<% else %>
+  <p>Transaction not found.</p>
+  <%= link_to 'Back to Transactions', transactions_path %>
+<% end %>
