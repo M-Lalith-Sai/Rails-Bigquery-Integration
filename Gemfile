@@ -17,9 +17,11 @@ gem "stimulus-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
-gem 'google-cloud-bigquery'
+gem 'google-cloud-bigquery', '~> 1.52.1'  # Use the highest available version
 
 gem 'csv'
+
+gem 'google-cloud-core'
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"

@@ -23,5 +23,16 @@ module BigqueryRailsApp
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    config.before_initialize do
+      begin
+        require 'google/cloud/bigquery'
+        puts "Google::Cloud::Bigquery loaded in config.before_initialize"
+      rescue LoadError => e
+        puts "LoadError loading google-cloud-bigquery: #{e.message}"
+      rescue StandardError => e
+        puts "StandardError loading google-cloud-bigquery: #{e.message}"
+      end
+    end
   end
 end

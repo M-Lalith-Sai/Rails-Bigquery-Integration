@@ -21,9 +21,38 @@ class TransactionsController < ApplicationController
 
   def create
     new_transaction = params[:transaction].permit!.to_h
+
+    # Add this back
     @transactions << new_transaction
-    flash[:notice] = "Transaction created!"
-    redirect_to transactions_path
+
+    # Attempt to insert into BigQuery
+    begin
+      bigquery_service = BigqueryService.new
+      bigquery_service.insert_record(
+        "transactions_v2",  # Use your BigQuery table name
+        {
+          "Transaction" => new_transaction["Transaction"],
+          "Timestamp" => new_transaction["Timestamp"],
+          "CustomerID" => new_transaction["CustomerID"],
+          "Name" => new_transaction["Name"],
+          "Surname" => new_transaction["Surname"],
+          "Shipping_State" => new_transaction["Shipping_State"],
+          "Item" => new_transaction["Item"],
+          "Description" => new_transaction["Description"],
+          "Retail_Price" => new_transaction["Retail_Price"],
+          "Loyalty_Discount" => new_transaction["Loyalty_Discount"],
+          "created_at" => Time.now.iso8601, # Add created_at and updated_at
+          "updated_at" => Time.now.iso8601
+        }
+      )
+      flash[:notice] = "Transaction created and sent to BigQuery!" # changed flash message
+      redirect_to transactions_path
+    rescue => e
+      puts e
+      flash[:error] = "Transaction created, but failed to insert into BigQuery: #{e.message}"
+      Rails.logger.error "Error inserting into BigQuery: #{e.message}"
+      redirect_to transactions_path # Consider redirecting to a different path
+    end
   end
 
   def edit

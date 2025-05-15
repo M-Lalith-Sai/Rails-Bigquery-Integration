@@ -415,7 +415,6 @@ PLATFORMS
   aarch64-linux-musl
   arm-linux-gnu
   arm-linux-musl
-  x86_64-linux
   x86_64-linux-gnu
   x86_64-linux-musl
 
@@ -425,7 +424,8 @@ DEPENDENCIES
   capybara
   csv
   debug
-  google-cloud-bigquery
+  google-cloud-bigquery (~> 1.52.1)
+  google-cloud-core
   importmap-rails
   jbuilder
   kamal

@@ -35,3 +35,5 @@
 
 # Ignore json sensitive file.
 config/locales/sensitive_credentials.json
+config/rails-bigquery-integration-new-5b0e3957b192.json
+config/rails-bigquery-integration-new-5b0e3957b192.json:Zone.Identifier
