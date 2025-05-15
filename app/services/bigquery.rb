@@ -19,6 +19,7 @@ class Bigquery
   # TODOs
   # Bigquery.new.setup_table(Transaction)
   def setup_table(model_class, partition_timestamp_column = "created_at")
+    setup
     db_name = model_class.connection_db_config.database
     table_name = model_class.table_name
     bq_table_name = "#{db_name.gsub("/", ".")}.#{table_name}".gsub(".", "-")
@@ -91,6 +92,7 @@ class Bigquery
 
   def generate_bigquery_schema(model_class)
     schema = model_class.columns.map do |col|
+      # unless Datalake::MODELS_SKIP_ATTRIBUTES[model_class.name].include?(col.name) # TODO
       {
         name: col.name,
         type: rails_type_to_bq(col.type),
