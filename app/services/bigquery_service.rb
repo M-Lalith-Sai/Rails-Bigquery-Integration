@@ -1,6 +1,6 @@
 require 'google/cloud/bigquery'
 require 'json'
-
+# testing
 class BigqueryService
   def initialize
     @project_id = Rails.configuration.database_configuration[Rails.env]["project_id"]
