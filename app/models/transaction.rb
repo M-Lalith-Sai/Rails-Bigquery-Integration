@@ -1,3 +1,3 @@
 class Transaction < ApplicationRecord
-    attribute :item, :integer
+    attribute :item, :integert
 end

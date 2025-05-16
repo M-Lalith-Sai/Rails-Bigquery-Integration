@@ -54,15 +54,19 @@ class Bigquery
 
     db_name = model_class.connection_db_config.database
     table_name = model_class.table_name
-
+    skip_attributes = Datalake::MODELS_SKIP_ATTRIBUTES[model_class.name] || []
+    columns_to_load=model_class.columns_names - skip_attributes
     start_time = Time.now
     # load full data
     data = []
     model_class.all.each do |record|
-      data << record.attributes
+      record_data= {}
+      columns_to_load.each { |col| record_data[col]=record.send(col) }
+      data << record.data.compact #Remove nil values
     end
     # Insert the data
     # TODO
+    insert_data_to_bigquery(model_class,data)
     end_time = Time.now
     BiSync.sync_update(db_name, table_name, start_time, end_time)
   end
@@ -72,17 +76,22 @@ class Bigquery
 
     db_name = model_class.connection_db_config.database
     table_name = model_class.table_name
+    skip_attributes = Datalake::MODELS_SKIP_ATTRIBUTES[model_class.name] || []
+    columns_to_load=model_class.columns_names - skip_attributes
     last_synced_on = BiSync.where(db_name: db_name, table_name: table_name).first.synced_on
 
     start_time = Time.now
     # load changes
     data = []
-    model_class.where([ "updated_at >= ?", last_synced_on ]).each do |record|
-      data << record.attributes
+    query = model_class.where("updated_at >= ?", last_synced_on) if last_synced_on
+    (query|| model_class).each do |record|
+      record_data= {}
+      columns_to_load.each { |col| record_data[col]=record.send(col) }
+      data << record_data.compact #Remove nil values
     end
     # Upsert the data
     # TODO
-
+    insert_data_to_bigquery(model_class, data, upsert: true)
     end_time = Time.now
     BiSync.sync_update(db_name, table_name, start_time, end_time)
   end
@@ -92,13 +101,16 @@ class Bigquery
 
   def generate_bigquery_schema(model_class)
     schema = model_class.columns.map do |col|
-      # unless Datalake::MODELS_SKIP_ATTRIBUTES[model_class.name].include?(col.name) # TODO
+    skip_attributes = Datalake::MODELS_SKIP_ATTRIBUTES[model_class.name] || []
+    schema=model_class.columns.map do |col|
+      unless skip_attributes.include?(col.name)
       {
         name: col.name,
         type: rails_type_to_bq(col.type),
         mode: col.null ? "NULLABLE" : "REQUIRED"
       }
-    end
+      end
+    end.compact
     JSON.pretty_generate(schema)
   end
 
